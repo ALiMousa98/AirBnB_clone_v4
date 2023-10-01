@@ -7,4 +7,7 @@ from flask import jsonify
 
 @app_views.route("/status", methods=["GET"])
 def status():
+    '''
+    Returns a JSON response for RESTful API health.
+    '''
     return jsonify({"status": "OK"})
