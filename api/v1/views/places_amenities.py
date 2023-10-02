@@ -7,7 +7,6 @@ from models.place import Place
 from models.amenity import Amenity
 from api.v1.views import app_views
 from flask import abort, jsonify, request, make_response
-from flasgger.utils import swag_from
 from os import environ
 STORAGE_TYPE = environ.get('HBNB_TYPE_STORAGE')
 
@@ -59,7 +58,7 @@ def amenity_to_place(place_id=None, amenity_id=None):
         if (amenity in place.amenities or
                 amenity.id in place.amenity_ids):
             return make_response(jsonify(amenity.to_dict()), 200)
-            
+
         if STORAGE_TYPE == 'db':
             place.amenities.append(amenity)
         else:
