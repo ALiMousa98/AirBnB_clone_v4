@@ -11,7 +11,7 @@ import os
 app = Flask(__name__)
 
 # Enable CORS and allow requests from any orgin:
-CORS(app, resources={r'/api/vi/*': {'origins': '0.0.0.0'}})
+CORS(app, resources={r'/*': {'origins': '0.0.0.0'}})
 # Register the app_views blueprint:
 app.register_blueprint(app_views)
 app.url_map.strict_slashes = False
