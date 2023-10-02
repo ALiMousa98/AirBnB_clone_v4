@@ -54,10 +54,9 @@ def amenity_to_place(place_id=None, amenity_id=None):
     return jsonify({}), 200
 
 
-
 @app_views.route('/places/<place_id>/amenities/<amenity_id>',
                  methods=['POST'])
-def amenity_to_place(place_id=None, amenity_id=None):
+def post_amenity_place(place_id=None, amenity_id=None):
     """
         reviews route to handle http methods for given review by ID
     """
