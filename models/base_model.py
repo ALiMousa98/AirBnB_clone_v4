@@ -69,6 +69,7 @@ class BaseModel:
         if save_fs is None:
             if 'password' in new_dict:
                 del new_dict['password']
+                new_dict.pop('password', None)
         return new_dict
 
     def delete(self):
