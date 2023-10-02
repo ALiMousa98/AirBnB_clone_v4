@@ -5,3 +5,5 @@ show_schema_with_constraints.sh
 show_tables.sh
 test_params_create
 test_save_reload_base_model.py
+main_delete.py
+main_place_amenities.py 
