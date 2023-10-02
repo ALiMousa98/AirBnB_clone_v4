@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 """Flask web application"""
 
-from flask import Flask
+from flask import Flask, jsonify, make_response
 from models import storage
 from api.v1.views import app_views
 import os
+
+
 app = Flask(__name__)
 
 # Register the app_views blueprint:
@@ -18,6 +20,12 @@ def teardown_db(exception):
     Calls storage.close() at the end of the request
     """
     storage.close()
+
+
+@app.errorhandler(404)
+def handle_404_error(error):
+    """Handler for Not Found errors"""
+    return make_response(jsonify({"error": "Not found"}), 404)
 
 
 if __name__ == "__main__":
