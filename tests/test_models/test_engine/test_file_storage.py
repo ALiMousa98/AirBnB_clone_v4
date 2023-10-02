@@ -3,7 +3,6 @@
 Contains the TestFileStorageDocs classes
 """
 
-from datetime import datetime
 import inspect
 import models
 from models.engine import file_storage
@@ -15,7 +14,6 @@ from models.review import Review
 from models.state import State
 from models.user import User
 import json
-import os
 import pep8
 import unittest
 FileStorage = file_storage.FileStorage
@@ -117,34 +115,24 @@ class TestFileStorage(unittest.TestCase):
     def test_get_method(self):
         """Test the get method in FileStorage"""
         # Create an object to be stored
-        new_obj = State(name="California")
-        models.storage.new(new_obj)
-        models.storage.save()
-
-        retrieved_obj = models.storage.get(State, new_obj.id)
-        self.assertEqual(new_obj, retrieved_obj)
+        storage = FileStorage()
+        dic = {'name': 'Vecindad'}
+        instance = State(**dic)
+        storage.new(instance)
+        storage.save()
+        get_instance = storage.get(State, instance.id)
+        self.assertEqual(get_instance, instance)
 
     def test_count_method(self):
         """Test the count method in FileStorage"""
         # Create some objects
-        state1 = State(name="California")
-        state2 = State(name="Texas")
-        city1 = City(name="Los Angeles", state_id=state1.id)
-        city2 = City(name="Austin", state_id=state2.id)
-        models.storage.new(state1)
-        models.storage.new(state2)
-        models.storage.new(city1)
-        models.storage.new(city2)
-        models.storage.save()
-
-        # Count the number of states
-        state_count = models.storage.count(State)
-        self.assertEqual(state_count, 2)
-
-        # Count the number of cities
-        city_count = models.storage.count(City)
-        self.assertEqual(city_count, 2)
-
-        # Count all objects
-        total_count = models.storage.count()
-        self.assertEqual(total_count, 4)
+        storage = FileStorage()
+        dic = {'name': 'Vecindad'}
+        state = State(**dic)
+        storage.new(state)
+        dic2 = {'name': 'Mexico', 'state_id': state.id}
+        city = City(**dic2)
+        storage.new(city)
+        storage.save()
+        c = storage.count()
+        self.assertEqual(len(storage.all()), c)

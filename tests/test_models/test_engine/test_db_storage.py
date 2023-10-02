@@ -3,19 +3,16 @@
 Contains the TestDBStorageDocs and TestDBStorage classes
 """
 
-from datetime import datetime
 import inspect
 import models
 from models.engine import db_storage
 from models.amenity import Amenity
-from models.base_model import BaseModel
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-import json
-import os
+from models import storage, storage_t
 import pep8
 import unittest
 DBStorage = db_storage.DBStorage
@@ -67,39 +64,52 @@ test_db_storage.py'])
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
-    def test_get_method(self):
-        """Test the get method in DBStorage"""
-        new_obj = State(name="California")
-        models.storage.new(new_obj)
-        models.storage.save()
 
-        retrieved_obj = models.storage.get(State, new_obj.id)
-        self.assertEqual(new_obj, retrieved_obj)
+@unittest.skipIf(storage_t != 'db', 'skip if environ is not db')
+class TestGetCountDB(unittest.TestCase):
+    """testing get and count methods"""
+    @classmethod
+    def setUpClass(cls):
+        print('\n\n.................................')
+        print('...... Testing Get and Count ......')
+        print('.......... DB Methods ..........')
+        print('.................................\n\n')
 
-    def test_count_method(self):
-        """Test the count method in DBStorage"""
-        # Create some objects
-        state1 = State(name="California")
-        state2 = State(name="Texas")
-        city1 = City(name="Los Angeles", state_id=state1.id)
-        city2 = City(name="Austin", state_id=state2.id)
-        models.storage.new(state1)
-        models.storage.new(state2)
-        models.storage.new(city1)
-        models.storage.new(city2)
-        models.storage.save()
+    def setUp(self):
+        """initializes new state and cities for testing"""
+        self.state = State()
+        self.state.name = 'California'
+        self.state.save()
+        self.city1 = City()
+        self.city1.name = 'Fremont'
+        self.city1.state_id = self.state.id
+        self.city1.save()
+        self.city2 = City()
+        self.city2.name = 'San_Francisco'
+        self.city2.state_id = self.state.id
+        self.city2.save()
 
-        # Count the number of states
-        state_count = models.storage.count(State)
-        self.assertEqual(state_count, 2)
+    def test_get(self):
+        """check if get method returns state"""
+        real_state = storage.get("State", self.state.id)
+        fake_state = storage.get("State", "12345")
+        no_state = storage.get("", "")
 
-        # Count the number of cities
-        city_count = models.storage.count(City)
-        self.assertEqual(city_count, 2)
+        self.assertEqual(real_state, self.state)
+        self.assertNotEqual(fake_state, self.state)
+        self.assertIsNone(no_state)
 
-        # Count all objects
-        total_count = models.storage.count()
-        self.assertEqual(total_count, 4)
+    def test_count(self):
+        """checks if count method returns correct numbers"""
+        state_count = storage.count("State")
+        city_count = storage.count("City")
+        place_count = storage.count("Place")
+        all_count = storage.count("")
+
+        self.assertEqual(state_count, 3)
+        self.assertEqual(city_count, 4)
+        self.assertEqual(place_count, 0)
+        self.assertEqual(all_count, 7)
 
 
 class TestFileStorage(unittest.TestCase):
