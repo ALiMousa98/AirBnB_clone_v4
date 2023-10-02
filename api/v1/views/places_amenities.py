@@ -55,12 +55,16 @@ def amenity_to_place(place_id=None, amenity_id=None):
         return jsonify({}), 200
 
     if request.method == 'POST':
-        if (amenity in place.amenities or
-                amenity.id in place.amenity_ids):
-            return make_response(jsonify(amenity.to_dict()), 200)
-
         if STORAGE_TYPE == 'db':
-            place.amenities.append(amenity)
+            if (amenity in place.amenities):
+                return make_response(jsonify(amenity.to_dict()), 200)
+            else:
+                place.amenities.append(amenity)
         else:
-            place.amenities = amenity
+            if (amenity.id in place.amenity_ids):
+                return make_response(jsonify(amenity.to_dict()), 200)
+            else:
+                place.amenity_ids.append(amenity_id)
+
+        storage.save()
         return make_response(jsonify(amenity.to_dict()), 201)
