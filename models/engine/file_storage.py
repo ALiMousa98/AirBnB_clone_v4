@@ -12,7 +12,6 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-from hashlib import md5
 
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
@@ -46,9 +45,7 @@ class FileStorage:
         """serializes __objects to the JSON file (path: __file_path)"""
         json_objects = {}
         for key in self.__objects:
-            if key == "password":
-                json_objects[key].decode()
-            json_objects[key] = self.__objects[key].to_dict(save_fs=1)
+            json_objects[key] = self.__objects[key].to_dict()
         with open(self.__file_path, 'w') as f:
             json.dump(json_objects, f)
 
@@ -59,7 +56,7 @@ class FileStorage:
                 jo = json.load(f)
             for key in jo:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
-        except:
+        except FileNotFoundError:
             pass
 
     def delete(self, obj=None):
@@ -75,8 +72,7 @@ class FileStorage:
 
     def get(self, cls, id):
         """
-        Returns the object based on the class name and its ID, or
-        None if not found
+        Retrieve an object by class and ID
         """
         if cls not in classes.values():
             return None
@@ -86,18 +82,15 @@ class FileStorage:
             if (value.id == id):
                 return value
 
-        return None
-
     def count(self, cls=None):
         """
-        count the number of objects in storage
+        Count the number of obj in storage
         """
-        all_class = classes.values()
-
+        all_classes = classes.values()
         if not cls:
             count = 0
-            for clas in all_class:
-                count += len(models.storage.all(clas).values())
+            for i in all_classes:
+                count += len(models.storage.all(i).values())
         else:
             count = len(models.storage.all(cls).values())
 
